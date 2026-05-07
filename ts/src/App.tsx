@@ -1,10 +1,10 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
-import './App.scss';
 import { useState } from "react";
-import AddPost from './AddPost'
-import SignUpForm from './SignUp'
-import Profile from './Profile'
-import LogInForm from './LogIn'
+import { Route, Routes, useNavigate } from "react-router-dom";
+import AddPost from './AddPost';
+import './App.scss';
+import LogInForm from './LogIn';
+import Profile from './Profile';
+import SignUpForm from './SignUp';
 
 function App() {
   const navigate = useNavigate()
@@ -15,10 +15,10 @@ function App() {
     e.stopPropagation();
     setIsMenuOpen(!isMenuOpen);
   }
-  function closeHumburger(e: React.MouseEvent) {
-    e.stopPropagation();
-    setIsMenuOpen(false);
-  }
+  // function closeHumburger(e: React.MouseEvent) {
+  //   e.stopPropagation();
+  //   setIsMenuOpen(false);
+  // }
   const handleAddPost = (newPost: any) => {
     setAllPosts((prev) => [newPost, ...prev]);
   };

@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
+import {  useState } from 'react'
 import { useNavigate } from "react-router-dom";
-import { auth } from './firebase';
+// import { auth } from './firebase';
 import './profile.scss'
 import { useLumina } from './Context';
 
 export default function SignUpForm() {
     const navigate = useNavigate();
-    const { userName, setUserName } = useLumina()
-    const { email, setEmail } = useLumina()
+    const { userName } = useLumina()
+    const { email } = useLumina()
     const [open, setOpen] = useState<boolean>(false);
     // const { activeWidgets, setActiveWidgets } = useWidget()
     // const { email, setEmail } = useWidget()

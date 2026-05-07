@@ -1,5 +1,5 @@
 import { auth } from './firebase';
-import { useEffect, useState } from 'react'
+import {  useState } from 'react'
 import { signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { useNavigate } from "react-router-dom";
 import { useLumina } from './Context';
@@ -10,7 +10,7 @@ export default function LogInForm() {
     const navigate = useNavigate();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [isSignedUp, setIsSignedUp] = useState<boolean>(false);
+    // const [isSignedUp, setIsSignedUp] = useState<boolean>(false);
     const { userName, setUserName } = useLumina()
 
     const onSubmit = (e: React.FormEvent) => {
@@ -30,8 +30,8 @@ export default function LogInForm() {
                 }
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
+                // const errorCode = error.code;
+                // const errorMessage = error.message;
                 if (error.code === 'auth/weak-password') {
                     alert('Пароль слишком слабый (нужно минимум 6 символов).');
                 } else if (error.code === 'auth/email-already-in-use') {

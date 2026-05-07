@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { db, auth, storage } from './firebase';
+import { db, auth } from './firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import "./Addpost.scss";
 
-import { useState, useEffect, useRef } from "react";
+import { useState,  useRef } from "react";
 
 interface Post {
     title: string;
