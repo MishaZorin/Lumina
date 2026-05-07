@@ -1,0 +1,89 @@
+.sectionSignUp {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 24px;
+    width: 100%;
+    max-width: 380px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.sectionSignUp h1 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: white;
+    font-size: 13px;
+}
+
+input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 12px;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 16px;
+}
+
+button[type="submit"]:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.flex-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.flex-buttons button {
+    flex: 1;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.flex-buttons button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+form > div {
+    margin-bottom: 16px;
+}

@@ -1,0 +1,283 @@
+// 1. Объявляем переменные
+$primary-purple: #a855f7;
+$bg-gradient: linear-gradient(135deg, #0b0b12, #1a1230);
+$card-bg: rgba(255, 255, 255, 0.05);
+$border-light: 1px solid rgba(255, 255, 255, 0.1);
+$transition: 0.3s ease;
+
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background: $bg-gradient;
+  color: #fff;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+
+  .logo {
+    font-weight: 700;
+    font-size: 20px;
+  }
+
+  .nav {
+    a {
+      margin: 0 12px;
+      opacity: 0.6;
+      cursor: pointer;
+
+
+    }
+  }
+
+  &-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+.search {
+  background: $card-bg;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: white;
+}
+
+.avatar {
+  display: flex;
+  gap: 10px;
+
+  button {
+    align-items: center;
+    height: 32px;
+    background-color: $primary-purple;
+    border-radius: 10%;
+    border: none;
+    color: white; // Добавлено для текста
+  }
+}
+
+/* Layout */
+.container {
+  display: flex;
+  gap: 24px;
+  padding: 20px 40px;
+}
+
+.main {
+  flex: 3;
+}
+
+.sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Posts */
+.post-item {
+  background: $card-bg;
+  padding: 24px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: $border-light;
+  margin-bottom: 24px;
+  transition: transform $transition, border-color $transition;
+
+  &:hover {
+    transform: translateY(-5px);
+    border-color: rgba($primary-purple, 0.4); // SCSS умеет работать с цветами
+  }
+
+  .post-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 16px 0;
+    background: linear-gradient(to right, #fff, $primary-purple);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  p {
+    opacity: 0.8;
+    line-height: 1.6;
+    font-size: 16px;
+    color: #e2e8f0;
+  }
+
+  .featured-img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+}
+
+.badge {
+  background: $primary-purple;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.featured-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: $border-light;
+
+  span {
+    opacity: 0.5;
+    font-size: 14px;
+  }
+
+  button {
+    background: $primary-purple;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+}
+
+/* Sidebar Cards */
+.card {
+  background: $card-bg;
+  padding: 16px;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+
+  h3,
+  h4 {
+    margin: 0 0 10px 0;
+  }
+
+  p {
+    opacity: 0.7;
+    font-size: 14px;
+  }
+
+  .secondary {
+    margin-top: 10px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+  }
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  span {
+    background: rgba($primary-purple, 0.2);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+  span:hover{
+  cursor: pointer;
+}
+}
+
+.headerMobile {
+  display: none;
+}
+
+@media(max-width:600px) {
+  .header {
+    display: none !important;
+  }
+
+  .headerMobile {
+    display: flex !important;
+  }
+
+  .container {
+    flex-direction: column;
+  }
+
+  // 👈 headerMobile - СКРЫТ по умолчанию
+.headerMobile {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #0b0b12, #1a1230);
+  position: relative;
+  z-index: 1001;
+}
+
+// 👈 Гамбургер - СКРЫТ по умолчанию
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
+
+// 👈 Мобильное меню - СКРЫТО справа
+.navMobile {
+  display: flex;
+  gap: 20px;
+  position: fixed;
+  top: 0;
+  right: -100%; /* 👈 СКРЫТО */
+  width: 80%;
+  height: 100vh;
+  background: #f8f9fa;
+  transition: right 0.3s ease;
+  z-index: 1000;
+  flex-direction: column;
+  padding: 80px 20px 20px;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+}
+
+.navMobile a {
+  text-decoration: none;
+  color: #333;
+  padding: 12px 0;
+  font-size: 18px;
+}
+
+.navMobile.active {
+  right: 0; /* 👈 ПОКАЗЫВАЕТСЯ */
+}
+
+// 👈 МЕДИА ЗАПРОСЫ
+@media (max-width: 600px) {
+  .header {
+    display: none !important;
+  }
+  
+  .headerMobile {
+    display: flex !important; /* 👈 ПОКАЗЫВАЕМ */
+  }
+  
+  .hamburger {
+    display: block !important; /* 👈 ГАМБУРГЕР ВИДИМ */
+  }
+}
+}
