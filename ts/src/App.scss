@@ -244,7 +244,7 @@ body {
   gap: 20px;
   position: fixed;
   top: 0;
-  right: -100%; /* 👈 СКРЫТО */
+  right: -100%;
   width: 80%;
   height: 100vh;
   background: #f8f9fa;
@@ -254,7 +254,20 @@ body {
   padding: 80px 20px 20px;
   box-shadow: -2px 0 10px rgba(0,0,0,0.1);
 }
+.mobileButtons{
+  display: flex;
+  flex-direction: column;
+  color: #0b0b12;
+  background-color: white;
 
+}
+.mobileButtons button{
+  background-color: white;
+  border: none;
+  font-size: 30px;
+  margin-top: 10px;
+
+}
 .navMobile a {
   text-decoration: none;
   color: #333;
