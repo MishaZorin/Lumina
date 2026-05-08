@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import AddPost from './AddPost';
 import './App.scss';
@@ -9,7 +9,17 @@ import SignUpForm from './SignUp';
 function App() {
   const navigate = useNavigate()
   const [filter, setFilter] = useState<string>('All')
-  const [allPosts, setAllPosts] = useState<any[]>([]);
+  const [allPosts, setAllPosts] = useState<any[]>(()=> {
+    const savedPosts = localStorage.getItem('allPosts')
+    if (savedPosts !== null) {
+      return JSON.parse(savedPosts)
+    }
+    return []
+
+  });
+  useEffect(()=>{
+    localStorage.setItem('allPosts', JSON.stringify(allPosts))
+  },[allPosts])
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   function openHumburger(e: React.MouseEvent) {
     e.stopPropagation();
@@ -65,9 +75,9 @@ function App() {
               <div className="logo">Lumina</div>
               <nav className="nav">
                 <a className="active">Explore</a>
-                <a>Trending</a>
+                {/* <a>Trending</a>
                 <a>Stories</a>
-                <a>Library</a>
+                <a>Library</a> */}
               </nav>
               <div className="header-right">
                 <div className="avatar">
