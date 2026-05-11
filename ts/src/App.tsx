@@ -1,15 +1,17 @@
 import { useState, useEffect, useMemo } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { 
-  collection, 
-  onSnapshot, 
-  addDoc, 
-  query, 
-  orderBy, 
-  serverTimestamp 
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  query,
+  orderBy,
+  serverTimestamp,
+  doc,
+  updateDoc
 } from 'firebase/firestore';
 import { db, auth } from './firebase';
-import AddPost from './AddPost';
+import AddPost from './AddPost';  // ✅ Без пропсов!
 import './App.scss';
 import LogInForm from './LogIn';
 import Profile from './Profile';
@@ -31,17 +33,20 @@ interface Post {
   tag: string;
   authorName: string;
   createdAt: any;
+  likes?: number;
 }
 
 function App() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<string>('All');
-  const [comments, setComments] = useState<Comment[]>([]); // ✅ Убрали хардкод
+  const [isLiked, setIsLiked] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [commentsValue, setCommentsValue] = useState<string>('');
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // ✅ Загрузка ПОСТОВ
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [likes, setLikes] = useState(0)
+  
   useEffect(() => {
     const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snap) => {
@@ -50,11 +55,29 @@ function App() {
         ...d.data()
       })) as Post[];
       setAllPosts(posts);
+      console.log(`📥 Загружено постов: ${posts.length}`);
+    }, (error) => {
+      console.error('Ошибка загрузки постов:', error);
     });
     return () => unsubscribe();
-  }, []);
+  }, [refreshKey]);
 
-  // ✅ Загрузка КОММЕНТАРИЕВ
+ const toggleLike = async (postId: string, currentLikes: number) => {
+  if (!auth.currentUser) {
+    alert("⚠️ Нужно войти, чтобы ставить лайки!");
+    return;
+  }
+
+  try {
+    const postRef = doc(db, 'posts', postId);
+    // Обновляем число лайков в БД (увеличиваем на 1)
+    await updateDoc(postRef, {
+      likes: (currentLikes || 0) + 1
+    });
+  } catch (error) {
+    console.error("Ошибка при лайке:", error);
+  }
+};
   useEffect(() => {
     const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snap) => {
@@ -63,23 +86,25 @@ function App() {
         ...d.data()
       })) as Comment[];
       setComments(commentsData);
+    }, (error) => {
+      console.error('Ошибка загрузки комментариев:', error);
     });
     return () => unsubscribe();
-  }, []);
+  }, [refreshKey]);
 
-  // ✅ ИСПРАВЛЕННАЯ функция создания комментария
+  // ✅ Создание комментария
   const createComment = async () => {
     if (!auth.currentUser) {
       alert("⚠️ Необходимо авторизоваться!");
       navigate("/logIn");
       return;
     }
-    
+
     if (!commentsValue.trim()) {
       alert("❌ Комментарий не может быть пустым!");
       return;
     }
-    
+
     try {
       const name = auth.currentUser.displayName || "Anonymous";
       await addDoc(collection(db, "comments"), {
@@ -88,12 +113,18 @@ function App() {
         createdAt: serverTimestamp(),
         likes: 0
       });
-      setCommentsValue(''); // ✅ Очищаем поле
-      // alert("✅ Комментарий опубликован!");
+      setCommentsValue('');
     } catch (error: any) {
       console.error("Ошибка:", error);
       alert("❌ Ошибка: " + error.message);
     }
+  };
+
+  // ✅ Принудительное обновление данных
+  const refreshData = () => {
+    setRefreshKey(prev => prev + 1);
+    setAllPosts([]);
+    setComments([]);
   };
 
   function openHumburger(e: React.MouseEvent) {
@@ -106,9 +137,7 @@ function App() {
     setIsMenuOpen(false);
   }
 
-  const handleAddPost = async (newPost: any) => {
-    await addDoc(collection(db, 'posts'), newPost);
-  };
+
 
   const filteredPosts = useMemo(() => {
     if (filter === 'All') return allPosts;
@@ -126,15 +155,24 @@ function App() {
               <nav className={`navMobile ${isMenuOpen ? 'active' : ''}`}>
                 <div className="header-right">
                   <div className="mobileButtons">
-                    <button
-                      onClick={(e) => {
-                        closeHumburger(e);
-                        navigate("/addPost");
-                      }}
-                    >
-                      Add post
+                    <button onClick={(e) => {
+                      closeHumburger(e);
+                      navigate("/addPost");
+                    }}>
+                      ➕ Add post
                     </button>
-                    <button onClick={() => navigate("/signUp")}>Account</button>
+                    <button onClick={() => {
+                      closeHumburger();
+                      navigate("/signUp");
+                    }}>
+                      👤 Account
+                    </button>
+                    <button onClick={() => {
+                      closeHumburger();
+                      navigate("/logIn");
+                    }}>
+                      🔐 Log In
+                    </button>
                   </div>
                 </div>
               </nav>
@@ -143,29 +181,39 @@ function App() {
               </button>
             </div>
 
-
+            {/* Десктопный хедер */}
             <header className="header">
-              <div className="logo">Lumina</div>
+              <div className="logo" onClick={() => navigate("/")}>Lumina</div>
               <nav className="nav">
-                <a className="active">Explore</a>
+                <a className="active" onClick={() => setFilter('All')}>Explore</a>
               </nav>
               <div className="header-right">
                 <div className="avatar">
-                  <button onClick={() => navigate("/addPost")}>Add post</button>
-                  <button onClick={() => navigate("/signUp")}>Account</button>
+                  <button onClick={() => navigate("/addPost")}>➕ Add post</button>
+                  <button onClick={() => navigate("/signUp")}>👤 Account</button>
                 </div>
               </div>
             </header>
+
+            {/* Кнопка обновления */}
+            <div className="refresh-controls">
+              <button
+                onClick={refreshData}
+                className="refresh-btn"
+              >
+                🔄 Обновить ({allPosts.length} постов, {comments.length} комм.)
+              </button>
+            </div>
 
             <div className="container">
               <div className="main">
                 <div className="featured">
                   {filteredPosts.length === 0 ? (
                     <div className="no-posts">
-                      <h2>Нет постов</h2>
-                      <p>Будьте первым, кто создаст пост!</p>
+                      <h2>{filter === 'All' ? 'Нет постов' : `Нет постов с тегом "${filter}"`}</h2>
+                      <p>{filter === 'All' ? 'Будьте первым!' : 'Попробуйте другой тег'}</p>
                       <button onClick={() => navigate("/addPost")}>
-                        Создать пост
+                        ➕ Создать первый пост
                       </button>
                     </div>
                   ) : (
@@ -179,9 +227,44 @@ function App() {
                           <span>
                             {post.authorName} ·{' '}
                             {post.createdAt?.seconds
-                              ? new Date(post.createdAt.seconds * 1000).toLocaleDateString()
-                              : new Date(post.createdAt).toLocaleDateString()}
+                              ? new Date(post.createdAt.seconds * 1000).toLocaleDateString('ru-RU')
+                              : new Date(post.createdAt).toLocaleDateString('ru-RU')}
                           </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+  <button
+    onClick={() => toggleLike(post.id, post.likes || 0)}
+    style={{
+      background: 'none',
+      border: '2px solid',
+      // Подсвечиваем, если лайки есть
+      borderColor: (post.likes || 0) > 0 ? '#ff4d4d' : '#ccc',
+      borderRadius: '20px',
+      padding: '5px 15px',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      transition: '0.3s',
+      outline: 'none'
+    }}
+  >
+    <span style={{
+      color: (post.likes || 0) > 0 ? '#ff4d4d' : '#ccc',
+      fontSize: '20px',
+      transition: '0.3s'
+    }}>
+      ❤
+    </span>
+
+    <span style={{
+      color: (post.likes || 0) > 0 ? '#ff4d4d' : '#666',
+      fontWeight: 'bold',
+      fontSize: '16px'
+    }}>
+      {post.likes || 0}
+    </span>
+  </button>
+</div>
                         </div>
                       </div>
                     ))
@@ -189,25 +272,25 @@ function App() {
                 </div>
               </div>
 
-              {/* ✅ ОТДЕЛЬНЫЙ БЛОК КОММЕНТАРИЕВ */}
+              {/* Комментарии */}
               <div className="comments-section">
                 <h3>💬 Комментарии ({comments.length})</h3>
                 {comments.length === 0 ? (
                   <div className="no-comments">
                     <p>Пока нет комментариев...</p>
-                    <p>Будьте первым!</p>
+                    <p>Будьте первым! 👆</p>
                   </div>
                 ) : (
                   <div className="comments-list">
                     {comments.map((comm) => (
-                      <div key={comm.id} className="comment-item">
+                      <div key={comm.id || Math.random()} className="comment-item">
                         <p>{comm.comment}</p>
                         <div className="comment-meta">
                           <small>{comm.authorName}</small>
                           <small>·</small>
                           <small>
                             {comm.createdAt?.seconds
-                              ? new Date(comm.createdAt.seconds * 1000).toLocaleDateString()
+                              ? new Date(comm.createdAt.seconds * 1000).toLocaleDateString('ru-RU')
                               : 'недавно'}
                           </small>
                         </div>
@@ -215,21 +298,24 @@ function App() {
                     ))}
                   </div>
                 )}
-                
-                {/* ✅ ОДНА ФОРМА КОММЕНТАРИЯ */}
+
                 <form onSubmit={(e) => {
                   e.preventDefault();
                   createComment();
                 }} className="comment-form">
-                  <input 
-                    type="text" 
-                    placeholder="Напишите комментарий..." 
+                  <input
+                    type="text"
+                    placeholder="Напишите комментарий..."
                     value={commentsValue}
                     onChange={(e) => setCommentsValue(e.target.value)}
                     maxLength={500}
+                    disabled={!auth.currentUser}
                   />
-                  <button type="submit" disabled={!commentsValue.trim() || !auth.currentUser}>
-                    {auth.currentUser ? 'Опубликовать' : 'Войдите'}
+                  <button
+                    type="submit"
+                    disabled={!commentsValue.trim() || !auth.currentUser}
+                  >
+                    {auth.currentUser ? '💬 Опубликовать' : '🔐 Войдите'}
                   </button>
                 </form>
               </div>
@@ -242,23 +328,43 @@ function App() {
                     A space dedicated to the high-end digital craftsman.
                     We explore technology, design, and philosophy.
                   </p>
-                  <a
-                    href="t.me/the_frontend_way"
-                    className="secondary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Follow Community
+                  <a href="t.me/the_frontend_way" className="secondary" target="_blank" rel="noopener noreferrer">
+                    👥 Follow Community
                   </a>
                 </div>
                 <div className="card">
                   <h4>Explore Topics</h4>
                   <div className="tags">
-                    <span onClick={() => setFilter('AI Ethics')}>AI Ethics</span>
-                    <span onClick={() => setFilter('Web3')}>Web3</span>
-                    <span onClick={() => setFilter('Typography')}>Typography</span>
-                    <span onClick={() => setFilter('Minimalism')}>Minimalism</span>
-                    <span onClick={() => setFilter('All')}>All</span>
+                    <span
+                      className={filter === 'All' ? 'active' : ''}
+                      onClick={() => setFilter('All')}
+                    >
+                      All ({allPosts.length})
+                    </span>
+                    <span
+                      className={filter === 'AI Ethics' ? 'active' : ''}
+                      onClick={() => setFilter('AI Ethics')}
+                    >
+                      🤖 AI Ethics
+                    </span>
+                    <span
+                      className={filter === 'Web3' ? 'active' : ''}
+                      onClick={() => setFilter('Web3')}
+                    >
+                      ₿ Web3
+                    </span>
+                    <span
+                      className={filter === 'Typography' ? 'active' : ''}
+                      onClick={() => setFilter('Typography')}
+                    >
+                      ✍ Typography
+                    </span>
+                    <span
+                      className={filter === 'Minimalism' ? 'active' : ''}
+                      onClick={() => setFilter('Minimalism')}
+                    >
+                      🎨 Minimalism
+                    </span>
                   </div>
                 </div>
               </aside>
@@ -266,7 +372,9 @@ function App() {
           </div>
         }
       />
-      <Route path="/addPost" element={<AddPost onAddPost={handleAddPost} />} />
+
+      {/* ✅ БЕЗ onAddPost - ОДИНОЧНОЕ сохранение! */}
+      <Route path="/addPost" element={<AddPost />} />
       <Route path="/signUp" element={<SignUpForm />} />
       <Route path="/logIn" element={<LogInForm />} />
       <Route path="/profile" element={<Profile />} />
