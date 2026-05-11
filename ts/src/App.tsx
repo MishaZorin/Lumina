@@ -143,7 +143,7 @@ function App() {
               </button>
             </div>
 
-            {/* Десктопный хедер */}
+
             <header className="header">
               <div className="logo">Lumina</div>
               <nav className="nav">

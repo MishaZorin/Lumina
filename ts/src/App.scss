@@ -237,44 +237,185 @@ body {
 }
 
 // 👈 Мобильное меню - СКРЫТО справа
+/* 👈 ФИОЛЕТОВАЯ ТЕМА */
+.headerMobile {
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+/* 👈 ФИОЛЕТОВЫЙ БУРГЕР */
+.hamburger {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+  
+  &:hover {
+    transform: scale(1.15) rotate(90deg);
+    box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+/* 👈 ФИОЛЕТОВОЕ МЕНЮ */
 .navMobile {
   display: flex;
+  flex-direction: column;
   gap: 20px;
   position: fixed;
   top: 0;
   right: -100%;
   width: 80%;
+  max-width: 340px;
   height: 100vh;
-  background: #f8f9fa;
-  transition: right 0.3s ease;
+  background: linear-gradient(180deg, 
+    #6b46c1 0%, 
+    #8b5cf6 50%, 
+    #a78bfa 100%);
+  transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
-  flex-direction: column;
-  padding: 80px 20px 20px;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+  padding: 90px 30px 40px;
+  box-shadow: -6px 0 40px rgba(139, 92, 246, 0.3);
+  overflow-y: auto;
+  
+  &.active {
+    right: 0;
+  }
 }
-.mobileButtons{
+
+/* 👈 ФИОЛЕТОВЫЕ КНОПКИ */
+.mobileButtons {
   display: flex;
   flex-direction: column;
-  color: #0b0b12;
-  background-color: white;
-
+  gap: 16px;
+  width: 100%;
+  
+  button {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    font-weight: 600;
+    padding: 20px 28px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    color: #4c1d95;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(139, 92, 246, 0.4), 
+        transparent);
+      transition: left 0.6s;
+    }
+    
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(139, 92, 246, 0.4);
+      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 1);
+      color: #7c3aed;
+      
+      &::before {
+        left: 100%;
+      }
+    }
+    
+    &:active {
+      transform: translateY(-2px);
+    }
+  }
 }
-.mobileButtons button{
-  background-color: white;
-  border: none;
-  font-size: 30px;
-  margin-top: 10px;
 
-}
+/* 👈 ФИОЛЕТОВЫЕ ССЫЛКИ */
 .navMobile a {
-  text-decoration: none;
-  color: #333;
-  padding: 12px 0;
+  color: white;
+  padding: 20px 28px;
   font-size: 18px;
+  font-weight: 500;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(12px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
 }
 
-.navMobile.active {
-  right: 0; /* 👈 ПОКАЗЫВАЕТСЯ */
+/* 👈 ФИОЛЕТОВОЕ ЗАТЕНЕНИЕ */
+.headerMobile::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.8), 
+    rgba(124, 58, 237, 0.6));
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+  
+  .navMobile.active + & {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* 👈 АДАПТИВНОСТЬ */
+@media (max-width: 480px) {
+  .navMobile {
+    width: 92%;
+    padding: 80px 24px 40px;
+  }
+  
+  .hamburger {
+    top: 16px;
+    right: 16px;
+    font-size: 24px;
+    padding: 10px;
+  }
+}
+
+/* 👈 АНИМАЦИИ */
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+  50% { box-shadow: 0 0 0 20px rgba(139, 92, 246, 0); }
+}
+
+.hamburger:hover {
+  animation: pulse 1.5s infinite;
 }
 
 // 👈 МЕДИА ЗАПРОСЫ

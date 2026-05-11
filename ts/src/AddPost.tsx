@@ -155,7 +155,7 @@ function AddPost({ onAddPost }: AddPostProps) {
                         </select>
 
                         <div className="actions">
-                            <button className="secondary">Save Draft</button>
+                           
                             <button className="primary" onClick={createNewPost}>
                                 Publish
                             </button>
