@@ -41,11 +41,11 @@ function AddPost({ onAddPost }: AddPostProps) {
         try {
             const name = auth.currentUser.displayName || "Anonymous";
 
-            // ✅ САХРАНЯЕМ base64 ПРЯМО В FIRESTORE
+           
             await addDoc(collection(db, "posts"), {
                 title: titleValue,
                 text: textValue,
-                image: imageValue, // ← base64 строка
+                image: imageValue, 
                 tag: tagValue || "General",
                 authorId: auth.currentUser.uid,
                 authorName: name,
@@ -64,7 +64,7 @@ function AddPost({ onAddPost }: AddPostProps) {
                 createdAt: new Date()
             });
 
-            // Сброс формы
+      
             setTextValue("");
             setTitleValue("");
             setImageValue("");
